@@ -3,10 +3,12 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { Welcome } from './welcome';
+import { UserInfoForm } from './user-info-form';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <UserInfoForm />
   </React.StrictMode>,
   document.getElementById('root')
 );
