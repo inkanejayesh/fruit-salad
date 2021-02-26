@@ -85,11 +85,7 @@ export const UserInfoForm = () => {
 
     },[finalTranscript])
 
-    const onUtteranceEnd = () => {
-    };
-
-
-    const a = new UserInfo();
+        const a = new UserInfo();
     const userInfo = {
         age:23,
         gender: "male",
@@ -179,8 +175,6 @@ const VoiceTextField = React.forwardRef(({id, label, utteranceText, isSpeaking, 
             }}
             variant={'outlined'}
             fullWidth
-            //InputLabelProps={{shrink:true}}
-         
        />
        </Container>
     );
