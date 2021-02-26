@@ -1,26 +1,93 @@
-import {Container, Box, TextField, Button} from '@material-ui/core'
+import {Container, Box, TextField, Button, Paper, Grid} from '@material-ui/core'
 import { UserInfo } from './types/user-info';
 import SpeechRecognition, {useSpeechRecognition} from 'react-speech-recognition';
 import {useState, useEffect} from 'react';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+
+
+const useStyles = makeStyles(theme => ({
+     paper:{
+         width : '750px',
+         height : '600px',
+         overflow : 'auto',
+         borderRadius : '4px',
+         padding : '32px',
+         '&::-webkit-scrollbar':{
+             width: '8px'
+         },
+         '&::-webkit-scrollbar-track':{
+            background: 'lightgray'
+        },
+        '&::-webkit-scrollbar-thumb':{
+            background: 'gray',
+            borderRadius: '40px'
+        }
+     }
+}))
+
+
 
 export const UserInfoForm = () => {
+    const classes = useStyles()
 
     const fieldNames = [
-        "age","disability"
+        "name","gender","age","city","marital status",
+        "highest eduction","usual monthly consumption expenditure",
+        "usual monthly medical expenditure","disability type",
+        "extent of personal assistant required in daliy activity",
+        "arrangement of regular care giver",
+        "infrequent medical expenses in last 365 days",
+        "infrequent non medical expenses in last 365 days",
+        "availing social security benefits",
+        "current monthly income",
     ];
 
-    const { transcript, resetTranscript, listening } = useSpeechRecognition();
+    const commands = [
+        {
+          command: 'My name is *',
+          //callback: () => video.play()
+        },
+    ];
+
+    useEffect(() => {
+        SpeechRecognition.startListening({continuous:true});
+        // let syn = window.speechSynthesis;
+        //  let utterance = new SpeechSynthesisUtterance("Hello world!");
+        //  syn.speak(utterance);
+    });
+
+    //SpeechRecognition.startListening({continuous:true});
+
+    const { transcript, resetTranscript, listening, finalTranscript } = useSpeechRecognition();
     
     const [fieldIdx, setFieldIdx] = useState(0);
 
-    // const handleSubmit = (event) => {
-    //     console.log('hi');
-    //     console.log(event.target.age.value);
-    //     // let utterance = new SpeechSynthesisUtterance("Hello world!");
-    //     // speechSynthesis.speak(utterance);
-    //     event.preventDefault();
-    // };
+    const itemsRef = React.useRef([]);
+
+    useEffect(() => {
+        itemsRef.current = itemsRef.current.slice(0, fieldNames.length);
+     }, [fieldNames]);
+
+
+    useEffect(() => {
+       //console.log(`transcript: ${transcript}`);
+       if(finalTranscript){
+       console.log(`${fieldNames[fieldIdx-1]}: ${finalTranscript}`);
+       resetTranscript();
+       setFieldIdx(fieldIdx + 1);
+       let syn = window.speechSynthesis;
+         let utterance = new SpeechSynthesisUtterance(`Please tell us your ${fieldNames[fieldIdx]}.`);
+         syn.speak(utterance);
+       }
+
+    },[finalTranscript])
+
+    const onUtteranceEnd = () => {
+    };
+
 
     const a = new UserInfo();
     const userInfo = {
@@ -28,135 +95,80 @@ export const UserInfoForm = () => {
         gender: "male",
     };
     
-    //SpeechRecognition.startListening({continuous:true});
-
-
-    // if(!listening){
-    //     //SpeechRecognition.stopListening();
-    //     console.log(transcript);
-    //     resetTranscript();
-    //     //setFieldIdx(fieldIdx+1);
-    // }
-
     document.onkeydown = function(e) {
         console.log(e.code);
-        if(e.code === 'KeyQ'){
-            //SpeechRecognition.startListening();
-            let sentence = `Please tell us your ${fieldNames[fieldIdx]}. Press W to record your answer, then press E to stop.`;
-            let utterance = new SpeechSynthesisUtterance(sentence);
-            speechSynthesis.speak(utterance);
-            // utterance.onend = () => {
-            //     console.log('start speaking');
-            //     //SpeechRecognition.startListening()
-            
-            // };
-            //recognition.start();
-        }
+        if(e.code === 'KeyQ'){}
+        
         if(e.code === 'KeyW'){
-            SpeechRecognition.startListening();
 
         }
         if(e.code === 'KeyE'){
-            console.log(transcript);
-            resetTranscript();
-            setFieldIdx(fieldIdx+1);
+        
         }
     };
 
-    // recognition.onresult = function(event){
-    //     var text = event.results[0][0].transcript;
-    //     console.log(text);
-    // }
-    //console.log(transcript);
-
-    const textFieldStyles = {
-        fontColor:'red',
-        border: 10
-    };
-
-    const useStyles = makeStyles({
-        root: {
-          backgroundColor: 'red',
-    
-        },
-      });
+      const handleStart = () => {
+        let sentence = `Please tell us your ${fieldNames[fieldIdx]}.`;
+        let utterance = new SpeechSynthesisUtterance(sentence);
+        speechSynthesis.speak(utterance);
+        console.log(`${fieldNames[fieldIdx]}: ${finalTranscript}`);
+        setFieldIdx(fieldIdx + 1);
+        
+      }
 
     const FormDetails = ({fieldNames}) => {
         const classes = useStyles();
         
         return (
-            <Container styles={textFieldStyles}>
-            <form >
+            <Paper className={classes.paper} elevation={3}>
+                <Button onClick={handleStart}>
+                    Start
+                </Button>
+            <form className={classes.root} >
                
                 <Box display="flex" flexDirection="column">
+                    <Grid container>
                 {fieldNames.map(function (field) {
-                    return(<VoiceTextField
+                    return(
+                        <Grid key={field} style={{marginBottom: '22px'}} item md={field.split(" ").length > 2 ? 12 : 4}
+                            xs={12}>
+                        <VoiceTextField
+                                
+                                ref={itemsRef.current[fieldIdx]}
                                 id={field}
                                 label={field}
                                 isSpeaking={field === fieldNames[fieldIdx]}
-                                utteranceText={`Please tell us your ${field}. Press W to record your answer, then press E to stop.`}
-                            />);
+                                utteranceText={`Please tell us your ${field}.`}
+                                onUtteranceEnd={onUtteranceEnd}
+                            />
+                        </Grid>
+                            );
                 })}
+                </Grid>
                 <Button type="submit">
                     Submit
                 </Button>
                 </Box>
             </form>
-        </Container>
+        </Paper>
         );
     }
 
-    // useEffect(() => {
-    //     if(!listening){
-    //         console.log(transcript)
-    //         SpeechRecognition.stopListening();
-    //         resetTranscript();
-    //         setFieldIdx(fieldIdx + 1);
-    //     }
-    //     //console.log(transcript)
-    //     console.log(listening)
-        
-    // }, [listening]);
-
-
     return(
 
-        <div>
+        <div style={{display:'flex', justifyContent:'center', alignItems:'center', width:'100vw', height: '100vh' }}>
             <FormDetails fieldNames={fieldNames}/>
         </div>
     
     );
 };
 
-const askInformation = (sentence) => {
-    let utterance = new SpeechSynthesisUtterance(sentence);
-    speechSynthesis.speak(utterance);
-};
+const VoiceTextField = React.forwardRef(({id, label, utteranceText, isSpeaking, onUtteranceEnd}, ref) => {
 
-const VoiceTextField = ({id, label, utteranceText, isSpeaking}) => {
-    console.log(`${id} ${isSpeaking}`)
-
-    useEffect(() => {
-        if(isSpeaking){
-            console.log('speaking')
-            let synth = window.speechSynthesis;
-            let utterance = new SpeechSynthesisUtterance(utteranceText);
-            // utterance.onend = function(){
-            //     SpeechRecognition.startListening();
-            // };
-            synth.speak(utterance);
-        }
-    })
-    // if(isSpeaking){
-    //         let synth = window.speechSynthesis;
-    //         let utterance = new SpeechSynthesisUtterance(utteranceText);
-    //         utterance.onend = function(){
-    //             SpeechRecognition.startListening();
-    //         };
-    //         synth.speak(utterance);
-    // }
     return(
-       <TextField id={id} label={label} onFocus={
+        <Container>
+       <TextField inputRef={el => ref = el} id={id} label={label} 
+           onFocus={
            () => {
             let synth = window.speechSynthesis;
             let utterance = new SpeechSynthesisUtterance(utteranceText);
@@ -164,8 +176,12 @@ const VoiceTextField = ({id, label, utteranceText, isSpeaking}) => {
                 SpeechRecognition.startListening();
             };
             synth.speak(utterance);
-
-           }
-       }/>
+            }}
+            variant={'outlined'}
+            fullWidth
+            //InputLabelProps={{shrink:true}}
+         
+       />
+       </Container>
     );
-};
+});
