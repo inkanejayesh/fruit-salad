@@ -83,7 +83,19 @@ export const UserInfoForm = () => {
          syn.speak(utterance);
        }
 
-    },[finalTranscript])
+    },[finalTranscript]);
+
+    // useEffect(() => {
+  //     if(!listening){
+  //         console.log(transcript)
+  //         SpeechRecognition.stopListening();
+  //         resetTranscript();
+  //         setFieldIdx(fieldIdx + 1);
+  //     }
+  //     //console.log(transcript)
+  //     console.log(listening)
+
+  // }, [listening]);s
 
         const a = new UserInfo();
     const userInfo = {
@@ -135,7 +147,6 @@ export const UserInfoForm = () => {
                                 label={field}
                                 isSpeaking={field === fieldNames[fieldIdx]}
                                 utteranceText={`Please tell us your ${field}.`}
-                                onUtteranceEnd={onUtteranceEnd}
                             />
                         </Grid>
                             );
@@ -156,10 +167,11 @@ export const UserInfoForm = () => {
             <FormDetails fieldNames={fieldNames}/>
         </div>
     
+
     );
 };
 
-const VoiceTextField = React.forwardRef(({id, label, utteranceText, isSpeaking, onUtteranceEnd}, ref) => {
+const VoiceTextField = React.forwardRef(({id, label, utteranceText, isSpeaking}, ref) => {
 
     return(
         <Container>
