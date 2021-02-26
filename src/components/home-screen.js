@@ -15,22 +15,21 @@ import CardMedia from "@material-ui/core/CardMedia";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import formImage from "../static/images/form-image.jpg";
-import predictionImage from "../static/images/prediction.jpg";
-import {UserInfoForm} from '../user-info-form';
+import { UserInfoForm } from "../user-info-form";
 
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
   },
   itemRoot: {
-    display: "flex",
+    // display: "flex",
     padding: theme.spacing(1),
     textAlign: "center",
     color: theme.palette.text.secondary,
-    height: "35vh",
+    height: "70vh",
   },
   grid: {
-    marginTop: "1em",
+    marginTop: "5vh",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -39,28 +38,28 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const FirstGridItem = () => {
+function handleForecastingClick(e) {
+  window.location.href =
+    "https://foo-bar-dot-hack-fruitsalad.uc.r.appspot.com/";
+}
+
+const FirstGridItem = ({ setLogin }) => {
   const classes = useStyles();
 
   return (
-    <Card elevation={3}>
+    <Card elevation={3} onClick={() => setLogin(true)}>
       <CardActionArea className={classes.itemRoot}>
-        <CardMedia
-          className={classes.image}
-          component="img"
-          alt="Form"
-          height="280"
-          src={formImage}
-          title="Form"
-        />
         <CardContent>
           <Typography gutterBottom variant="h5" component="h2">
             Investment Calculator
           </Typography>
-          <Typography
-            variant="body2"
-            color="textSecondary"
-            component="p"></Typography>
+          <Typography variant="body1" color="textSecondary" component="p">
+            Whether you're considering getting started with investing or you're
+            already a seasoned investor, an investment calculator can help you
+            figure out how to meet your goals. It can show you how your initial
+            investment, frequency of contributions and risk tolerance can all
+            affect how your money grows.
+          </Typography>
         </CardContent>
       </CardActionArea>
     </Card>
@@ -71,32 +70,26 @@ const SecondGridItem = () => {
   const classes = useStyles();
 
   return (
-    <Card elevation={3}>
+    <Card elevation={3} onClick={handleForecastingClick}>
       <CardActionArea className={classes.itemRoot}>
-        <CardMedia
-          className={classes.image}
-          component="img"
-          alt="Form"
-          height="280"
-          src={formImage}
-          title="Form"
-          flex="1"
-        />
         <CardContent flex="1">
           <Typography gutterBottom variant="h5" component="h2">
-            Portfolio Performance
+            Advanced Portfolio Forecasting
           </Typography>
-          <Typography
-            variant="body2"
-            color="textSecondary"
-            component="p"></Typography>
+          <Typography variant="body1" color="textSecondary" component="p">
+            'NAME' provides the capabilities needed for assessing baseline
+            conditions, forecasting need, proposing alternative planning
+            scenarios, and evaluating complex tradeoffs over the short, medium,
+            and long-term portfolio planning periods based on your current and
+            future needs.
+          </Typography>
         </CardContent>
       </CardActionArea>
     </Card>
   );
 };
 
-const FullWidthGrid = () => {
+const FullWidthGrid = ({ setLogin }) => {
   const classes = useStyles();
 
   return (
@@ -104,16 +97,10 @@ const FullWidthGrid = () => {
       <Container maxWidth={false}>
         <Grid container spacing={3} className={classes.grid}>
           <Grid item xs={6}>
-            <FirstGridItem />
+            <FirstGridItem setLogin={setLogin} />
           </Grid>
           <Grid item xs={6}>
             <SecondGridItem />
-          </Grid>
-          <Grid item xs={6}>
-            <FirstGridItem />
-          </Grid>
-          <Grid item xs={6}>
-            <FirstGridItem />
           </Grid>
         </Grid>
       </Container>
@@ -124,16 +111,16 @@ const FullWidthGrid = () => {
 export const HomeScreen = ({ login, setLogin, setAssistant }) => {
   const { transcript, resetTranscript } = useSpeechRecognition();
 
-  useEffect(() => {
-    let sentence = `Would you like to enable voice assistant for this session?`;
-    let utterance = new SpeechSynthesisUtterance(sentence);
-    speechSynthesis.speak(utterance);
-    utterance.onend = () => {
-      console.log("start speaking");
-      SpeechRecognition.startListening();
-    };
-    SpeechRecognition.startListening();
-  }, [login]);
+  //   useEffect(() => {
+  //     let sentence = `Would you like to enable voice assistant for this session?`;
+  //     let utterance = new SpeechSynthesisUtterance(sentence);
+  //     speechSynthesis.speak(utterance);
+  //     utterance.onend = () => {
+  //       console.log("start speaking");
+  //       SpeechRecognition.startListening();
+  //     };
+  //     SpeechRecognition.startListening();
+  //   }, [login]);
 
   useEffect(() => {
     if (transcript) {
@@ -142,16 +129,13 @@ export const HomeScreen = ({ login, setLogin, setAssistant }) => {
     }
   }, [transcript]);
 
-  return (
-    
-      login ? <UserInfoForm/>
-      :
-      <div>
-        <LoginButton setLogin={setLogin} />
-        {transcript}
-        <FullWidthGrid />
-      </div>
-    
-    
+  return login ? (
+    <UserInfoForm />
+  ) : (
+    <div>
+      <LoginButton setLogin={setLogin} />
+      {transcript}
+      <FullWidthGrid setLogin={setLogin} />
+    </div>
   );
 };
