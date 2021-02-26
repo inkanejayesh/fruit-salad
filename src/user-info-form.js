@@ -77,7 +77,7 @@ export const UserInfoForm = () => {
     useEffect(() => {
        //console.log(`transcript: ${transcript}`);
        console.log(`final transcript: ${finalTranscript}`)
-       if(finalTranscript){
+       if(finalTranscript && fieldIdx < fieldNames.length + 1){
     //    console.log(`${fieldNames[fieldIdx-1]}: ${finalTranscript}`);
     //    const arr = [...fieldValues];
     //    setFieldValues(arr.push(finalTranscript));
