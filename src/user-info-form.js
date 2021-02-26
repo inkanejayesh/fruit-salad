@@ -151,15 +151,25 @@ export const UserInfoForm = () => {
         );
     }
 
-    return(
+  function handleSubmit() {
+    console.log("Redirecting...");
+    window.location.href =
+      "https://foo-bar-dot-hack-fruitsalad.uc.r.appspot.com";
+  }
+  
 
-        <div style={{display:'flex', justifyContent:'center', alignItems:'center', width:'100vw', height: '100vh',
-        background:'gray' }}>
-            <FormDetails fieldNames={fieldNames}/>
-        </div>
-    
-
-    );
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100vw",
+        height: "100vh",
+      }}>
+      <FormDetails fieldNames={fieldNames} />
+    </div>
+  );
 };
 
 const VoiceTextField = React.forwardRef(({id, label, utteranceText, isSpeaking, displayValue}, ref) => {
@@ -171,8 +181,8 @@ const VoiceTextField = React.forwardRef(({id, label, utteranceText, isSpeaking, 
            () => {
             let synth = window.speechSynthesis;
             let utterance = new SpeechSynthesisUtterance(utteranceText);
-            utterance.onend = function(){
-                SpeechRecognition.startListening();
+            utterance.onend = function () {
+              SpeechRecognition.startListening();
             };
             synth.speak(utterance);
             }}
@@ -182,4 +192,5 @@ const VoiceTextField = React.forwardRef(({id, label, utteranceText, isSpeaking, 
        />
        </Container>
     );
-});
+  }
+);
