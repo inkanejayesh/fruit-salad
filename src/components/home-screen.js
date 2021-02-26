@@ -124,24 +124,7 @@ const FullWidthGrid = () => {
 export const HomeScreen = ({ login, setLogin, setAssistant }) => {
   const { transcript, resetTranscript } = useSpeechRecognition();
 
-  useEffect(() => {
-    let sentence = `Would you like to enable voice assistant for this session?`;
-    let utterance = new SpeechSynthesisUtterance(sentence);
-    speechSynthesis.speak(utterance);
-    utterance.onend = () => {
-      console.log("start speaking");
-      SpeechRecognition.startListening();
-    };
-    SpeechRecognition.startListening();
-  }, [login]);
-
-  useEffect(() => {
-    if (transcript) {
-      if (transcript === "yes") setAssistant(true);
-      else setAssistant(false);
-    }
-  }, [transcript]);
-
+  
   return (
     
       login ? <UserInfoForm/>

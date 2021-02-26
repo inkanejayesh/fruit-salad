@@ -21,7 +21,7 @@ export default function LoginButton({ setLogin }) {
         onClick={() => {
           setLogin((prevLogin) => !prevLogin);
         }}>
-        Login
+        Click here or Press Space
       </Button>
     </div>
   );

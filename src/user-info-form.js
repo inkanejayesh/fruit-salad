@@ -1,12 +1,12 @@
 import {Container, Box, TextField, Button, Paper, Grid} from '@material-ui/core'
 import { UserInfo } from './types/user-info';
 import SpeechRecognition, {useSpeechRecognition} from 'react-speech-recognition';
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useReducer} from 'react';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-
+let fieldValues = [];
 
 const useStyles = makeStyles(theme => ({
      paper:{
@@ -34,32 +34,32 @@ export const UserInfoForm = () => {
     const classes = useStyles()
 
     const fieldNames = [
-        "name","gender","age","city","marital status",
-        "highest eduction","usual monthly consumption expenditure",
-        "usual monthly medical expenditure","disability type",
-        "extent of personal assistant required in daliy activity",
-        "arrangement of regular care giver",
-        "infrequent medical expenses in last 365 days",
-        "infrequent non medical expenses in last 365 days",
-        "availing social security benefits",
-        "current monthly income",
+        "Name","Gender","Age","City","Marital Status",
+        "Highest Education","Usual monthly consumption expenditure",
+        "Usual monthly medical expenditure","Disability type",
+        "Extent of personal assistant required in daliy activity",
+        "Arrangement of regular care giver",
+        "Infrequent medical expenses in last 365 days",
+        "Infrequent non medical expenses in last 365 days",
+        "Availing social security benefits",
+        "Current monthly income",
     ];
 
-    const commands = [
-        {
-          command: 'My name is *',
-          //callback: () => video.play()
-        },
-    ];
+    const INITIAL_STATE = {
+        name:'',
+        gender:'',
+        age:'',
+        city:'',
+        maritalStatus:'',
+
+    }
+
+    const [fieldValues, setFieldValues] = useState([]);
 
     useEffect(() => {
         SpeechRecognition.startListening({continuous:true});
-        // let syn = window.speechSynthesis;
-        //  let utterance = new SpeechSynthesisUtterance("Hello world!");
-        //  syn.speak(utterance);
-    });
-
-    //SpeechRecognition.startListening({continuous:true});
+        handleStart();
+    },[]);
 
     const { transcript, resetTranscript, listening, finalTranscript } = useSpeechRecognition();
     
@@ -71,11 +71,19 @@ export const UserInfoForm = () => {
         itemsRef.current = itemsRef.current.slice(0, fieldNames.length);
      }, [fieldNames]);
 
+     const [text, setText] = useState('');
+
 
     useEffect(() => {
        //console.log(`transcript: ${transcript}`);
+       console.log(`final transcript: ${finalTranscript}`)
        if(finalTranscript){
-       console.log(`${fieldNames[fieldIdx-1]}: ${finalTranscript}`);
+    //    console.log(`${fieldNames[fieldIdx-1]}: ${finalTranscript}`);
+    //    const arr = [...fieldValues];
+    //    setFieldValues(arr.push(finalTranscript));
+    //     console.log(fieldValues);
+    fieldValues.push(finalTranscript);
+    setText(finalTranscript)
        resetTranscript();
        setFieldIdx(fieldIdx + 1);
        let syn = window.speechSynthesis;
@@ -85,36 +93,13 @@ export const UserInfoForm = () => {
 
     },[finalTranscript]);
 
-    // useEffect(() => {
-  //     if(!listening){
-  //         console.log(transcript)
-  //         SpeechRecognition.stopListening();
-  //         resetTranscript();
-  //         setFieldIdx(fieldIdx + 1);
-  //     }
-  //     //console.log(transcript)
-  //     console.log(listening)
-
-  // }, [listening]);s
-
         const a = new UserInfo();
     const userInfo = {
         age:23,
         gender: "male",
     };
+    console.log(fieldValues);
     
-    document.onkeydown = function(e) {
-        console.log(e.code);
-        if(e.code === 'KeyQ'){}
-        
-        if(e.code === 'KeyW'){
-
-        }
-        if(e.code === 'KeyE'){
-        
-        }
-    };
-
       const handleStart = () => {
         let sentence = `Please tell us your ${fieldNames[fieldIdx]}.`;
         let utterance = new SpeechSynthesisUtterance(sentence);
@@ -124,36 +109,41 @@ export const UserInfoForm = () => {
         
       }
 
+
     const FormDetails = ({fieldNames}) => {
         const classes = useStyles();
         
         return (
             <Paper className={classes.paper} elevation={3}>
-                <Button onClick={handleStart}>
-                    Start
-                </Button>
+            <Container style={{color: 'black',  padding:12, fontSize:40, fontFamily: 'Roboto Slab, serif;'}}>
+                Portfolio Management Form
+            </Container>
+            <Container>
+            {`Text generated : ${text}`}
+            </Container>
             <form className={classes.root} >
                
                 <Box display="flex" flexDirection="column">
                     <Grid container>
                 {fieldNames.map(function (field) {
                     return(
-                        <Grid key={field} style={{marginBottom: '22px'}} item md={field.split(" ").length > 2 ? 12 : 4}
+                        <Grid key={field} style={{marginBottom: '22px'}} item md={
+                            field === "Disability type" ? 12 : field.split(" ").length > 2 ? 12 : 4}
                             xs={12}>
                         <VoiceTextField
-                                
                                 ref={itemsRef.current[fieldIdx]}
                                 id={field}
                                 label={field}
                                 isSpeaking={field === fieldNames[fieldIdx]}
                                 utteranceText={`Please tell us your ${field}.`}
+                                displayValue={fieldValues[fieldIdx]}
                             />
                         </Grid>
                             );
                 })}
                 </Grid>
-                <Button type="submit">
-                    Submit
+                <Button onClick={handleStart}>
+                    Start
                 </Button>
                 </Box>
             </form>
@@ -163,7 +153,8 @@ export const UserInfoForm = () => {
 
     return(
 
-        <div style={{display:'flex', justifyContent:'center', alignItems:'center', width:'100vw', height: '100vh' }}>
+        <div style={{display:'flex', justifyContent:'center', alignItems:'center', width:'100vw', height: '100vh',
+        background:'gray' }}>
             <FormDetails fieldNames={fieldNames}/>
         </div>
     
@@ -171,8 +162,8 @@ export const UserInfoForm = () => {
     );
 };
 
-const VoiceTextField = React.forwardRef(({id, label, utteranceText, isSpeaking}, ref) => {
-
+const VoiceTextField = React.forwardRef(({id, label, utteranceText, isSpeaking, displayValue}, ref) => {
+    console.log(displayValue);
     return(
         <Container>
        <TextField inputRef={el => ref = el} id={id} label={label} 
@@ -187,6 +178,7 @@ const VoiceTextField = React.forwardRef(({id, label, utteranceText, isSpeaking},
             }}
             variant={'outlined'}
             fullWidth
+            value={displayValue}
        />
        </Container>
     );
